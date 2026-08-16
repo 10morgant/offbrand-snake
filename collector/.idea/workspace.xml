@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="e9ad5119-87b5-4101-87f9-c9039379012a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/collector/commands/fetch.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/collector/commands/fetch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/collector/commands/names.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/collector/commands/names.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/collector/commands/process.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/collector/commands/process.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/collector/utils/http_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/collector/utils/http_client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/collector/utils/registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/collector/utils/pypi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/collector/utils/shared.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/collector/utils/shared.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/collector/utils/storage.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/collector/utils/storage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_fetch.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_fetch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uv.lock" beforeDir="false" afterPath="$PROJECT_DIR$/uv.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../models/src/models/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/../models/src/models/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../names.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../names.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tags.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../tags.sh" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/home/tim/Github/tinkering/mirrors_ui/pypi/collector" value="3I0LzbjKsJFBC8iezzh0sprvyVn" />
+    </persistenceIdMap>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 8,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3I0LzbjKsJFBC8iezzh0sprvyVn" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "last_opened_file_path": "/home/tim/Github/tinkering/mirrors_ui/pypi/collector",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-PY-261.23567.174" />
+        <option value="bundled-python-sdk-024ed6589d45-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.23567.174" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e9ad5119-87b5-4101-87f9-c9039379012a" name="Changes" comment="" />
+      <created>1786896803193</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1786896803193</updated>
+      <workItem from="1786896804461" duration="3000" />
+    </task>
+    <servers />
+  </component>
+</project>

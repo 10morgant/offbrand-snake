@@ -1,0 +1,19 @@
+[project]
+name = "server"
+version = "1.0.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "asyncpg>=0.30.0",
+    "fastapi[standard]>=0.139.2",
+    "shared",
+    "psycopg2-binary>=2.9.12",
+    "pyyaml>=6.0.3",
+    "requests>=2.34.2",
+    "sqlmodel>=0.0.39",
+    "markdown>=3.10.3",
+    "docutils>=0.23",
+]
+
+[tool.uv.sources]
+shared = { path = "../shared", editable = true }

@@ -1,0 +1,228 @@
+
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.package-description {
+  color: var(--mantine-color-text);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  padding-block: 1rem 2rem;
+}
+
+.package-description h1,
+.package-description h2,
+.package-description h3,
+.package-description h4 {
+  margin: 1.25rem 0 0.75rem;
+  line-height: 1.25;
+  color: var(--mantine-color-white);
+  scroll-margin-top: 5rem;
+}
+
+.package-description h1,
+.package-description h2 {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--mantine-color-dark-4);
+}
+
+.package-description h1 {
+  font-size: 2rem;
+}
+
+.package-description h2 {
+  font-size: 1.5rem;
+}
+
+.package-description h3 {
+  font-size: 1.2rem;
+}
+
+.package-description p,
+.package-description ul,
+.package-description ol,
+.package-description pre,
+.package-description blockquote {
+  margin: 0.75rem 0;
+}
+
+.package-description a {
+  color: var(--mantine-color-blue-4);
+  text-decoration: none;
+}
+
+.package-description a:hover {
+  text-decoration: underline;
+}
+
+.package-description article,
+.package-description section {
+  margin-block: 1rem;
+}
+
+.package-description article {
+  padding: 1.25rem;
+  border: 1px solid var(--mantine-color-dark-4);
+  border-radius: var(--mantine-radius-md);
+  background: var(--mantine-color-dark-7);
+}
+
+.package-description details {
+  margin-block: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--mantine-color-dark-4);
+  border-radius: var(--mantine-radius-md);
+  background: var(--mantine-color-dark-7);
+  /*padding-top: 1.8rem;*/
+  padding: 0.8rem 2.75rem 0.8rem 1rem;
+
+}
+
+.package-description details[open] {
+  border-color: var(--mantine-color-blue-7);
+}
+
+.package-description summary {
+  position: relative;
+  /*padding: 0.8rem 2.75rem 0.8rem 1rem;*/
+  padding-bottom: .8rem;
+  color: var(--mantine-color-gray-1);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.package-description summary::-webkit-details-marker {
+  display: none;
+}
+
+.package-description summary::after {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  content: "+";
+  color: var(--mantine-color-blue-4);
+  font-size: 1.25rem;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.package-description details[open] > summary {
+  border-bottom: 1px solid var(--mantine-color-dark-4);
+}
+
+.package-description details[open] > summary::after {
+  content: "\2212";
+}
+
+.package-description summary:hover {
+  background: var(--mantine-color-dark-6);
+}
+
+.package-description summary:focus-visible {
+  outline: 2px solid var(--mantine-color-blue-5);
+  outline-offset: -2px;
+}
+
+.package-description details > :not(summary) {
+  margin-right: 1rem;
+  margin-left: 1rem;
+}
+
+.package-description hr {
+  margin-block: 2rem;
+  border: 0;
+  border-top: 1px solid var(--mantine-color-dark-4);
+}
+
+.package-description li + li {
+  margin-top: 0.25rem;
+}
+
+.package-description li::marker {
+  color: var(--mantine-color-blue-4);
+}
+
+.package-description code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+}
+
+.package-description pre {
+  overflow-x: auto;
+  border: 1px solid var(--mantine-color-dark-4);
+  border-radius: 8px;
+  background: #0f1720;
+}
+
+.package-description pre code {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9rem;
+  padding: 1rem;
+  line-height: 1.6;
+}
+
+.package-description kbd {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--mantine-color-dark-3);
+  border-bottom-width: 2px;
+  border-radius: var(--mantine-radius-xs);
+  background: var(--mantine-color-dark-6);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85em;
+}
+
+.package-description blockquote {
+  margin-left: 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--mantine-color-dark-4);
+  color: var(--mantine-color-dimmed);
+}
+
+.package-description img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-block: 1rem;
+  border-radius: var(--mantine-radius-sm);
+}
+
+.package-description table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.package-description th,
+.package-description td {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--mantine-color-dark-4);
+  text-align: left;
+}
+
+.package-description th {
+  background: var(--mantine-color-dark-6);
+  color: var(--mantine-color-gray-1);
+  font-weight: 600;
+}
+
+.package-description tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}

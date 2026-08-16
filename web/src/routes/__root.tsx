@@ -1,0 +1,143 @@
+import {createRootRoute, Link, Outlet} from '@tanstack/react-router'
+import {
+    AppShell,
+    AppShellHeader,
+    Container,
+    createTheme, DataListItemLabel, DataListItemValue,
+    Group,
+    MantineProvider,
+    Text,
+    ThemeIcon,
+    Title,
+} from '@mantine/core'
+import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query'
+
+import '../styles.css'
+import '@mantine/core/styles.css'
+import {RegistryProvider, useRegistryContext} from "#/context/RegistryContext.tsx";
+import {colourTheme} from "#/config/colours.ts";
+import {IconBrandPython} from "@tabler/icons-react";
+import {fetchLastUpdatedOptions, fetchRegistriesOptions} from "#/logic/queries.ts";
+import {formatDate} from "#/logic/utils.ts";
+import type {Registry} from "#/logic/types.ts";
+import {Apps} from "#/components /core/Apps.tsx";
+
+const queryClient = new QueryClient()
+
+export const Route = createRootRoute({
+    component: RootComponent,
+})
+
+const theme = createTheme({
+    colors: {
+        theme: [
+            "#e8f7ff",
+            "#d9e9f6",
+            "#b6d0e5",
+            "#8fb6d5",
+            "#6f9fc6",
+            "#5991be",
+            "#4584b6",
+            "#3c77a6",
+            "#306a96",
+            "#1d5c86"
+        ]
+    },
+    components: {
+        AppShellHeader: AppShellHeader.extend({
+            defaultProps: {
+                bg: colourTheme.hero_top
+            }
+        }),
+        Container: Container.extend({
+            defaultProps: {
+                size: 1600
+            }
+        }),
+        DataListItemLabel: DataListItemLabel.extend({
+            defaultProps: {
+                fz: 16,
+                fw: 500,
+                c:"white",
+                tt:"uppercase"
+            }
+        }),
+        DataListItemValue: DataListItemValue.extend({
+            defaultProps: {
+                fz: 16,
+                fw: 500,
+                c:"rgb(93, 202, 165)",
+                // tt:"uppercase"
+            }
+        }),
+    },
+    fontFamily: "ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'"
+})
+
+function AppHeader() {
+    const {config, setConfig} = useRegistryContext()
+    const {data: registries} = useQuery(fetchRegistriesOptions())
+    const {data: last_updated} = useQuery(fetchLastUpdatedOptions())
+
+    if (!config?.url && registries) {
+        const reg: Registry = registries[0]
+        setConfig({url: reg.url, name: reg.display_name ?? reg.url})
+    }
+
+    return (
+        <>
+            <AppShell.Header p="15">
+                <Group justify="space-between" h="100%">
+                    <Group>
+                        <Apps/>
+                        <Link to="/" style={{
+                            textDecoration: 'none',
+                            color: 'inherit',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 12
+                        }}>
+                            <ThemeIcon size="40" variant="light">
+                                <IconBrandPython/>
+                            </ThemeIcon>
+                            <Title order={4}>PyPI Registry UI</Title>
+                        </Link>
+                    </Group>
+                    <Group>
+                        <Text> Last updated: {formatDate(last_updated?.timestamp ?? "-")} </Text>
+                        {/*<Text>Registry: </Text>
+                        <Select
+                            data={registries?.map((reg) => (
+                                {label: reg.display_name, value: reg.url}
+                            )) ?? []}
+                            value={config?.url ?? "??"}
+                            onChange={(val, option) => {
+                                if (val) {
+                                    setConfig({url: val, name: option.label})
+                                }
+                            }}
+                        />*/}
+                    </Group>
+
+                </Group>
+            </AppShell.Header>
+        </>
+    )
+}
+
+function RootComponent() {
+    return (
+        <MantineProvider theme={theme} forceColorScheme="dark">
+            <QueryClientProvider client={queryClient}>
+                <RegistryProvider>
+                    <AppShell header={{height: 70}}>
+                        <AppHeader/>
+                        <AppShell.Main style={{backgroundColor: colourTheme.page}}>
+                            <Outlet/>
+                        </AppShell.Main>
+                    </AppShell>
+                </RegistryProvider>
+            </QueryClientProvider>
+        </MantineProvider>
+    )
+}
