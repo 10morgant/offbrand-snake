@@ -71,14 +71,15 @@ async def get_markdown(
 
     result = await session.exec(stmt)
     dbo: Package | None = result.first()
-    if dbo and dbo.description and dbo.description_content_type:
-        if "markdown" in dbo.description_content_type:
-            return markdown.markdown(
-                dbo.description,
-                extensions=["fenced_code", "tables", "sane_lists"],
-            )
-        elif "rst" in dbo.description_content_type:
-            return publish_string(dbo.description, writer_name="html5").decode("utf-8")
+    if dbo:
+        if dbo.description and dbo.description_content_type:
+            if "markdown" in dbo.description_content_type:
+                return markdown.markdown(
+                    dbo.description,
+                    extensions=["fenced_code", "tables", "sane_lists"],
+                )
+            elif "rst" in dbo.description_content_type:
+                return publish_string(dbo.description, writer_name="html5").decode("utf-8")
         return dbo.description
     raise HTTPException(404, f"{package} not found")
 

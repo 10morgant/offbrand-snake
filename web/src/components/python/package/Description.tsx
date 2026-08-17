@@ -4,6 +4,8 @@ import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
 import {useEffect, useMemo, useRef} from 'react'
 
+
+
 export function Description({generated}: { generated?: string }) {
     const contentRef = useRef<HTMLDivElement>(null)
 
