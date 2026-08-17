@@ -7,6 +7,7 @@ import {useRegistryContext} from "#/context/RegistryContext.tsx";
 import {colourTheme} from "#/config/colours.ts";
 import {useQuery} from "@tanstack/react-query";
 import {fetchStatsOptions} from "#/logic/queries.ts";
+import {PackagesView} from "#/components/python/PackagesView.tsx";
 
 export const Route = createFileRoute('/')({component: Home})
 
@@ -43,6 +44,11 @@ function Home() {
                             color="blue"
                         />
                     </SimpleGrid>
+                </Container>
+            </div>
+            <div>
+                <Container  pt={40} pb={40}>
+                    <PackagesView/>
                 </Container>
             </div>
 
