@@ -1,15 +1,42 @@
 import markdown
 from docutils.core import publish_string
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from packaging.requirements import Requirement
+from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from db import get_session
-from shared.models import Package, PackageRead, PackageDBOtoRead, PackageRequirement
+from shared.models import Package, PackageRead, PackageDBOtoRead, PackageRequirement, PackagePage
 
 router = APIRouter(prefix="/package", tags=["packages"])
+
+
+@router.get("/", response_model=PackagePage, tags=["packages"])
+async def get_all_packages(
+        limit: int = Query(50, ge=0, le=500),
+        offset: int = Query(0, ge=0),
+        session: AsyncSession = Depends(get_session),
+):
+    total_result = await session.exec(
+        select(func.count()).select_from(Package)
+    )
+    total = total_result.one()
+
+    stmt = (
+        select(Package).order_by(Package.name)
+    )
+    if limit > 0:
+        stmt = stmt.offset(offset).limit(limit)
+
+    result = await session.exec(stmt)
+    items = [
+        PackageDBOtoRead(pack)
+        for pack in result.all()
+    ]
+
+    return PackagePage(total=total, limit=limit, offset=offset, items=items)
 
 
 @router.get("/{package:str}", response_model=PackageRead, tags=["packages"])

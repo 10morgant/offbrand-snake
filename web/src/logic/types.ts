@@ -1,6 +1,6 @@
 export type ViewType = "grid" | "list"
 
-export interface ImagesRoot {
+export interface PackageRoot {
     total: number
     limit: number
     offset: number

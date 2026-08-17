@@ -3,21 +3,20 @@ import {IconFolder} from "@tabler/icons-react";
 import {Link, useNavigate} from "@tanstack/react-router";
 import {useQuery} from "@tanstack/react-query";
 import {useEffect, useMemo, useState} from "react";
-import {fetchNamespacesOptions} from "#/logic/queries.ts";
-import {useRegistryContext} from "#/context/RegistryContext.tsx";
+import {fetchPackagesOptions} from "#/logic/queries.ts";
 import {SkeletonCard} from "#/components/python/Cards/SkeletonCard.tsx";
-import {NamespaceCard} from "#/components/python/Cards/NamespaceCard.tsx";
 import type {ViewType} from "#/logic/types";
+import {PackageCard} from "#/components/python/package/cards/PackageCard.tsx";
 
 const DEFAULT_PAGE_SIZE = 24;
-const NAMESPACES_PAGE_SIZE_KEY = 'namespacesPageSize';
+const PACAKGES_PAGE_SIZE_KEY = 'packagesPageSize';
 
 const getStoredPageSize = (fallback: number) => {
     if (typeof window === 'undefined') {
         return fallback;
     }
 
-    const stored = window.localStorage.getItem(NAMESPACES_PAGE_SIZE_KEY);
+    const stored = window.localStorage.getItem(PACAKGES_PAGE_SIZE_KEY);
     if (!stored) {
         return fallback;
     }
@@ -34,8 +33,13 @@ interface Props {
 }
 
 
-export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, viewType = "grid", page: routePage}: Props) {
-    const {config} = useRegistryContext()
+export function PackagesView({
+                                 initialPageSize = DEFAULT_PAGE_SIZE,
+                                 cols = 3,
+                                 viewType = "grid",
+                                 page: routePage
+                             }: Props) {
+
     const navigate = useNavigate();
     const [pageSize, setPageSize] = useState<number>(() => getStoredPageSize(initialPageSize));
     const [page, setPage] = useState(routePage && routePage > 0 ? routePage : 1);
@@ -43,7 +47,7 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            window.localStorage.setItem(NAMESPACES_PAGE_SIZE_KEY, pageSize.toString());
+            window.localStorage.setItem(PACAKGES_PAGE_SIZE_KEY, pageSize.toString());
         }
     }, [pageSize]);
 
@@ -54,17 +58,17 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
     }, [routePage, page]);
 
     const {data, isPending, isPlaceholderData} = useQuery({
-        ...fetchNamespacesOptions(config?.url ?? "http://example.com", pageSize, offset),
+        ...fetchPackagesOptions(pageSize, offset),
     });
 
-    const namespaces = useMemo(() => data?.items ?? [], [data?.items]);
+    const packages = useMemo(() => data?.items ?? [], [data?.items]);
     const totalPages = data ? Math.max(1, Math.ceil(data.total / pageSize)) : 1;
     const showSkeleton = isPending;
 
     const handlePageChange = (nextPage: number) => {
         const safePage = Math.max(1, nextPage);
         setPage(safePage);
-        navigate({to: safePage === 1 ? '/namespaces/' : `/namespaces/${safePage}`});
+        navigate({to: safePage === 1 ? '/project/' : `/project?page=${safePage}`});
     };
 
     const handlePageSizeChange = (value: string | null) => {
@@ -72,7 +76,7 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
         const nextSize = parseInt(value, 10);
         setPageSize(nextSize);
         setPage(1);
-        navigate({to: '/namespaces'});
+        navigate({to: '/project'});
     };
 
     return (
@@ -81,13 +85,13 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
                 justify="space-between"
                 component={Link}
                 // @ts-ignore
-                to={"/namespaces/"}
+                to={"/project/"}
             >
-                <Title order={4}>Namespaces</Title>
+                <Title order={4}>Packages</Title>
                 <Text size="sm" c="dimmed">
                     {showSkeleton
                         ? "..."
-                        : `${namespaces.length}/${data?.total ?? 0} namespace${data?.total !== 1 ? "s" : ""}`}
+                        : `${packages.length}/${data?.total ?? 0} package${data?.total !== 1 ? "s" : ""}`}
                 </Text>
             </Group>
 
@@ -95,10 +99,10 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
                 <EmptyState
                     withIndicatorBackground
                     icon={<IconFolder color="var(--mantine-color-yellow-4)"/>}
-                    title="No namespaces found"
+                    title="No packages found"
                 >
                     <EmptyState.Description>
-                        There are no docker namespaces available right now.
+                        There are no pypi packages available right now.
 
                     </EmptyState.Description>
                     <EmptyState.Actions>
@@ -112,7 +116,10 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
                     <Pagination total={totalPages} value={page} onChange={handlePageChange}/>
                     <Select
                         placeholder="Page size"
-                        data={[10, 20, initialPageSize, 50, 100].map((size) => ({value: size.toString(), label: `${size} per page`}))}
+                        data={[10, 20, initialPageSize, 50, 100].map((size) => ({
+                            value: size.toString(),
+                            label: `${size} per page`
+                        }))}
                         value={pageSize.toString()}
                         onChange={handlePageSizeChange}
                     />
@@ -127,8 +134,8 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
                 >
                     {showSkeleton
                         ? Array.from({length: cols}).map((_, i) => <SkeletonCard key={i}/>)
-                        : namespaces.map((ns, i) => (
-                            <NamespaceCard key={i} ns={ns}/>
+                        : packages.map((pack, i) => (
+                            <PackageCard key={i} data={pack}/>
                         ))}
                 </SimpleGrid>
             )}
@@ -140,8 +147,8 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
                 >
                     {showSkeleton
                         ? Array.from({length: cols}).map((_, i) => <SkeletonCard key={i}/>)
-                        : namespaces.map((ns, i) => (
-                            <NamespaceCard key={i} ns={ns}/>
+                        : packages.map((pack, i) => (
+                            <PackageCard key={i} data={pack}/>
                         ))}
                 </Stack>
             )}
@@ -152,7 +159,10 @@ export function NamespacesView({initialPageSize = DEFAULT_PAGE_SIZE, cols = 4, v
                     <Pagination total={totalPages} value={page} onChange={handlePageChange}/>
                     <Select
                         placeholder="Page size"
-                        data={[10, 20, initialPageSize, 50, 100].map((size) => ({value: size.toString(), label: `${size} per page`}))}
+                        data={[10, 20, initialPageSize, 50, 100].map((size) => ({
+                            value: size.toString(),
+                            label: `${size} per page`
+                        }))}
                         value={pageSize.toString()}
                         onChange={handlePageSizeChange}
                     />

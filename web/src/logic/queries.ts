@@ -1,7 +1,9 @@
 import type {
     ImagesRoot,
     LastUpdated,
-    PackageInfo, PackageRequirement,
+    PackageInfo,
+    PackageRequirement,
+    PackageRoot,
     Registry,
     SearchRoot,
     Stats
@@ -53,22 +55,22 @@ export const fetchRegistries = async (): Promise<Registry[]> => {
     return await response.json()
 }
 
-export const fetchNamespacesOptions = (url: string, limit: number, offset: number) => {
+export const fetchPackagesOptions = (limit: number, offset: number) => {
     return {
-        queryKey: [url, 'namespaces', limit, offset],
-        // queryFn: () => fetchNamespaces(url, limit, offset),
+        queryKey: ['packages', limit, offset],
+        queryFn: () => fetchPackages(limit, offset),
         staleTime: 5 * 60 * 1000, // 5 minutes
     }
 }
 
-export const fetchNamespaces = async (url: string, limit: number, offset: number): Promise<NamespacesRoot> => {
+export const fetchPackages = async (limit: number, offset: number): Promise<PackageRoot> => {
     const response = await fetch(
-        buildUrl(`/api/namespaces`, {url, limit, offset})
+        buildUrl(`/api/package/`, {limit, offset})
     )
 
     if (!response.ok) {
         throw new Error(
-            `Failed to fetch catalog: ${response.status} ${response.statusText}`
+            `Failed to fetch packages: ${response.status} ${response.statusText}`
         )
     }
 
