@@ -1,6 +1,6 @@
 import {Container, Stack, Title} from "@mantine/core";
 import {colourTheme} from "#/config/colours.ts";
-import {SearchBar} from "#/components /python/Search.ts";
+import {SearchBar} from "#/components/python/Search.ts";
 
 export function Hero() {
     return (

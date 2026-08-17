@@ -13,10 +13,10 @@ import {
 import {useMemo, useState} from "react";
 import {compareItems, rankItem} from "@tanstack/match-sorter-utils";
 import type {Image, Namespace, ViewType} from "#/logic/types.ts";
-import {ImageCard} from "#/components /python/Cards/ImageCard.tsx";
+import {ImageCard} from "#/components/python/Cards/ImageCard.tsx";
 import {IconPackage, IconSearch} from "@tabler/icons-react";
 import {colourTheme} from "#/config/colours.ts";
-import {SkeletonCard} from "#/components /python/Cards/SkeletonCard.tsx";
+import {SkeletonCard} from "#/components/python/Cards/SkeletonCard.tsx";
 
 
 

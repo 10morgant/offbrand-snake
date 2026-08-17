@@ -5,8 +5,8 @@ import {useQuery} from "@tanstack/react-query";
 import {useEffect, useMemo, useState} from "react";
 import {fetchNamespacesOptions} from "#/logic/queries.ts";
 import {useRegistryContext} from "#/context/RegistryContext.tsx";
-import {SkeletonCard} from "#/components /python/Cards/SkeletonCard.tsx";
-import {NamespaceCard} from "#/components /python/Cards/NamespaceCard.tsx";
+import {SkeletonCard} from "#/components/python/Cards/SkeletonCard.tsx";
+import {NamespaceCard} from "#/components/python/Cards/NamespaceCard.tsx";
 import type {ViewType} from "#/logic/types";
 
 const DEFAULT_PAGE_SIZE = 24;

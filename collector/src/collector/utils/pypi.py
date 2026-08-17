@@ -1,9 +1,8 @@
 from __future__ import annotations
 
+from datetime import datetime
 import json
 from pathlib import Path
-
-from datetime import datetime
 from typing import Any, Callable
 
 import httpx
@@ -44,7 +43,7 @@ async def fetch_package_metadata(
     info = data.get("info") or {}
     releases: dict[str, list[dict[str, Any]]] = data.get("releases") or {}
     if data and save:
-        out = Path("data/pypi") / package_name
+        out = Path("data/pypi") / (package_name + ".json")
         log_fn(f"Saving {package_name} {out}")
         out.parent.mkdir(parents=True, exist_ok=True)
         json.dump(data, open(out, "w"), indent=4)
@@ -66,10 +65,12 @@ async def fetch_package_metadata(
                 packagetype=file_info.get("packagetype"),
                 size=file_info.get("size"),
                 digest=digests.get("sha256"),
-                created_at=parse_upload_time(file_info.get("upload_time_iso_8601")),
+                created_at=parse_upload_time(
+                    file_info.get("upload_time_iso_8601")),
                 requires_python=file_info.get("requires_python"),
                 yanked=bool(file_info.get("yanked", False)),
                 yanked_reason=file_info.get("yanked_reason"),
+                url=file_info.get("url")
             ))
 
     payload = PackagePayload(

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional, List
 from sqlalchemy import Column, JSON, Text
-from sqlmodel import SQLModel, Field, Relationship, Session
+from sqlmodel import SQLModel, Field, Relationship, Session, BigInteger
 
 class LastUpdated(SQLModel, table=True):
     id: int = Field(default=1, primary_key=True)
@@ -53,10 +53,11 @@ class PackageVersion(SQLModel, table=True):
     packagetype: str | None = None
     filename: str | None = None
     digest: str | None = Field(default=None, index=True)
-    size: int | None = None
+    size: int | None = Field(default=None, sa_type=BigInteger)
     created_at: datetime | None = Field(default=None, index=True)
     yanked: bool = False
     yanked_reason: str | None = None
+    url: str | None = None
     src_registry: str = Field(index=True)
 
     package: Package = Relationship(back_populates="versions")
@@ -77,6 +78,7 @@ class PackageVersionRead(SQLModel):
     filename: str | None = None
     yanked: bool = False
     yanked_reason: str | None = None
+    url: str | None = None
 
 
 class PackageRead(SQLModel):
@@ -84,7 +86,7 @@ class PackageRead(SQLModel):
     name: str
     self_hosted: bool
     versions: List[PackageVersionRead] = Field(default_factory=list)
-    regsitry: str
+    registry: str
     summary: str | None = None
     author: str | None = None
     license: str | None = None
@@ -149,6 +151,7 @@ def VersionDBOtoRead(dbo: PackageVersion):
         filename=dbo.filename,
         yanked=dbo.yanked,
         yanked_reason=dbo.yanked_reason,
+        url=dbo.url,
     )
 
 
@@ -158,7 +161,7 @@ def PackageDBOtoRead(dbo: Package, versions: bool = False) -> PackageRead:
         id=dbo.id,
         name=dbo.name,
         self_hosted=dbo.self_hosted,
-        regsitry=dbo.src_registry,
+        registry=dbo.src_registry,
         summary=dbo.summary,
         author=dbo.author,
         license=dbo.license,
@@ -186,3 +189,12 @@ def PackageDBOtoRead(dbo: Package, versions: bool = False) -> PackageRead:
         yanked=dbo.yanked,
         versions=[VersionDBOtoRead(v) for v in dbo.versions] if versions else []
     )
+
+
+class PackageRequirement(SQLModel):
+    package_id: int
+    name: str
+    url: str | None = None
+    extras: set[str] = Field(default_factory=set)
+    specifier: str | None = None
+    marker: str | None = None

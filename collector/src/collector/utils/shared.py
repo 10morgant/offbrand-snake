@@ -26,6 +26,7 @@ class VersionFile:
     requires_python: str | None
     yanked: bool
     yanked_reason: str | None
+    url: str | None
 
 
 @dataclass

@@ -1,12 +1,13 @@
 import markdown
 from docutils.core import publish_string
 from fastapi import APIRouter, Depends, HTTPException
+from packaging.requirements import Requirement
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from db import get_session
-from shared.models import Package, PackageRead, PackageDBOtoRead
+from shared.models import Package, PackageRead, PackageDBOtoRead, PackageRequirement
 
 router = APIRouter(prefix="/package", tags=["packages"])
 
@@ -38,7 +39,6 @@ async def get_markdown(
     print(package)
     stmt = (
         select(Package)
-        .options(selectinload(Package.versions))
         .where(Package.name == package)
     )
 
@@ -53,4 +53,35 @@ async def get_markdown(
         elif "rst" in dbo.description_content_type:
             return publish_string(dbo.description, writer_name="html5").decode("utf-8")
         return dbo.description
+    raise HTTPException(404, f"{package} not found")
+
+
+@router.get("/{package:str}/deps", response_model=list[PackageRequirement], tags=["packages"])
+async def det_deps(
+        package: str,
+        session: AsyncSession = Depends(get_session),
+):
+    print(package)
+    stmt = (
+        select(Package)
+        .where(Package.name == package)
+    )
+
+    result = await session.exec(stmt)
+    dbo: Package | None = result.first()
+    if dbo:
+        requires = dbo.requires_dist
+        res = [Requirement(req) for req in requires]
+        return [
+            PackageRequirement(
+                package_id=dbo.id,
+                name=req.name,
+                url=req.url,
+                extra=set(str(s) for s in req.extras),
+                specifier=str(req.specifier),
+                marker=str(req.marker)
+            )
+            for req in res
+        ]
+
     raise HTTPException(404, f"{package} not found")

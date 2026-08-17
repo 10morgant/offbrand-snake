@@ -1,9 +1,7 @@
 import type {
     ImagesRoot,
     LastUpdated,
-    Namespace,
-    NamespacesRoot,
-    PackageInfo,
+    PackageInfo, PackageRequirement,
     Registry,
     SearchRoot,
     Stats
@@ -77,17 +75,17 @@ export const fetchNamespaces = async (url: string, limit: number, offset: number
     return await response.json()
 }
 
-export const fetchNamespaceOptions = (url: string, namespace: string) => {
+export const fetchDepsOptions = (pack: string) => {
     return {
-        queryKey: [url, 'namespaces', namespace],
-        // queryFn: () => fetchNamespace(url, namespace),
+        queryKey: ['package', pack, "readme"],
+        queryFn: () => fetchDeps(pack),
         staleTime: 5 * 60 * 1000, // 5 minutes
     }
 }
 
-export const fetchNamespace = async (url: string, namespace: string): Promise<Namespace> => {
+export const fetchDeps = async (pack: string): Promise<PackageRequirement[]> => {
     const response = await fetch(
-        buildUrl(`/api/namespaces/${namespace}`, {url, namespace})
+        buildUrl(`/api/package/${pack}/deps`)
     )
 
     if (!response.ok) {

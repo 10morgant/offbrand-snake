@@ -148,12 +148,51 @@ body {
   border-top: 1px solid var(--mantine-color-dark-4);
 }
 
+.package-description ul,
+.package-description ol {
+  padding-left: 1.5rem;
+  list-style-position: outside;
+}
+
+.package-description ul {
+  list-style-type: disc;
+}
+
+.package-description ol {
+  list-style-type: decimal;
+}
+
+.package-description ul ul,
+.package-description ol ul {
+  list-style-type: circle;
+}
+
+.package-description ul ul ul,
+.package-description ol ul ul {
+  list-style-type: square;
+}
+
+.package-description li > ul,
+.package-description li > ol {
+  margin: 0.4rem 0 0;
+}
+
 .package-description li + li {
   margin-top: 0.25rem;
 }
 
 .package-description li::marker {
   color: var(--mantine-color-blue-4);
+}
+
+.package-description li.task-list-item {
+  list-style: none;
+  margin-left: -1.5rem;
+}
+
+.package-description li.task-list-item input[type="checkbox"] {
+  margin-right: 0.5rem;
+  accent-color: var(--mantine-color-blue-5);
 }
 
 .package-description code {
@@ -225,4 +264,9 @@ body {
 
 .package-description tbody tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.025);
+}
+
+.package-card {
+  border-radius: 15px;
+  padding: 20px;
 }

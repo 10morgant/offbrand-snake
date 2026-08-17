@@ -20,7 +20,7 @@ import {IconBrandPython} from "@tabler/icons-react";
 import {fetchLastUpdatedOptions, fetchRegistriesOptions} from "#/logic/queries.ts";
 import {formatDate} from "#/logic/utils.ts";
 import type {Registry} from "#/logic/types.ts";
-import {Apps} from "#/components /core/Apps.tsx";
+import {Apps} from "#/components/core/Apps.tsx";
 
 const queryClient = new QueryClient()
 

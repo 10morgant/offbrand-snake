@@ -44,12 +44,26 @@ def upsert_versions_for_payloads(session: Session, registry: str, package_by_nam
         for version in payload.versions:
             row = existing_by_key.get((package.id, version.filename))
             if row is None:
-                session.add(PackageVersion(package_id=package.id, version=version.version, requires_python=version.requires_python, packagetype=version.packagetype, filename=version.filename, digest=version.digest, size=version.size, created_at=version.created_at, yanked=version.yanked, yanked_reason=version.yanked_reason, src_registry=registry))
+                session.add(PackageVersion(
+                    package_id=package.id,
+                    version=version.version,
+                    requires_python=version.requires_python,
+                    packagetype=version.packagetype,
+                    filename=version.filename,
+                    digest=version.digest,
+                    size=version.size,
+                    created_at=version.created_at,
+                    yanked=version.yanked,
+                    yanked_reason=version.yanked_reason,
+                    src_registry=registry,
+                    url=version.url
+                ))
                 inserted += 1
             else:
                 row.requires_python, row.packagetype = version.requires_python, version.packagetype
                 row.digest, row.size = version.digest, version.size
                 row.created_at, row.yanked, row.src_registry = version.created_at, version.yanked, registry
+                row.yanked_reason, row.url = version.yanked_reason, version.url
                 updated += 1
     return inserted, updated
 

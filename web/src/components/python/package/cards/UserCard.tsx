@@ -8,10 +8,17 @@ interface Props {
 
 export function UserCard({name, email, type}: Props) {
     return (
-        <Card radius={0} p={20} withBorder shadow={"md"}>
+        <Card
+            className={"package-card"}
+            // pt={15}
+            // p={20}
+            withBorder
+            shadow={"md"}
+            // bg={"#aaaaaa80"}
+        >
             <Title order={4} pb={10}>{type}</Title>
             <Flex gap={10} align={"center"}>
-                <Avatar name={name ?? ""} color="initials" ></Avatar>
+                <Avatar name={name ?? ""} color="initials"></Avatar>
                 <Stack gap={0}>
                     <Text>{name ? name : email}</Text>
                     <Text>{name ? email : ""}</Text>

@@ -1,8 +1,8 @@
 import {Link} from '@tanstack/react-router'
-import {Hero} from "#/components /core/Hero.tsx";
+import {Hero} from "#/components/core/Hero.tsx";
 import {Breadcrumbs, Container, Stack} from "@mantine/core";
 import {IconHomeFilled} from "@tabler/icons-react";
-import {NamespacesView} from "#/components /python/NamespacesView.tsx";
+import {NamespacesView} from "#/components/python/NamespacesView.tsx";
 
 export function NamespacesPageLayout({page}: { page?: number }) {
     const breadcrumbItems = [

@@ -1,8 +1,8 @@
 import {createFileRoute} from '@tanstack/react-router'
 import {Container, NumberFormatter, SimpleGrid} from "@mantine/core";
-import {Hero} from "#/components /core/Hero.tsx";
+import {Hero} from "#/components/core/Hero.tsx";
 import {IconBox, IconFolder} from "@tabler/icons-react";
-import {StatCard} from "#/components /core/StatsCards.tsx";
+import {StatCard} from "#/components/core/StatsCards.tsx";
 import {useRegistryContext} from "#/context/RegistryContext.tsx";
 import {colourTheme} from "#/config/colours.ts";
 import {useQuery} from "@tanstack/react-query";
@@ -37,7 +37,7 @@ function Home() {
                         />
                         <StatCard
                             icon={<IconBox size={24}/>}
-                            label="Total versions"
+                            label="Registry"
                             value={config?.url}
                             loading={false}
                             color="blue"

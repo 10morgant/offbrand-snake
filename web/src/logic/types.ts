@@ -26,6 +26,7 @@ export interface Version {
     filename: string;
     yanked: boolean;
     yanked_reason?: string;
+    url: string;
 }
 
 export interface PackageInfo {
@@ -73,4 +74,15 @@ export interface Registry {
 
 export interface LastUpdated {
     timestamp: string
+}
+
+export interface PackageRequirement {
+    package_id:number,
+    name:string
+    extras:string[]
+    url?:string
+    specifier?:string
+    marker?:string
+
+
 }

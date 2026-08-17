@@ -16,11 +16,18 @@ export function Description({generated}: { generated?: string }) {
         if (!contentRef.current) return
 
         contentRef.current.querySelectorAll('pre code').forEach((block) => {
-            const languageClass = [...block.classList]
-                .find((className) => className.startsWith('language-'))
-            const language = languageClass?.slice('language-'.length)
+            const classNames = [
+                ...block.classList,
+                ...(block.closest('pre')?.classList ?? []),
+            ]
+            const language = classNames
+                .map((className) => className.startsWith('language-')
+                    ? className.slice('language-'.length)
+                    : className
+                )
+                .find((className) => hljs.getLanguage(className))
 
-            if (!language || !hljs.getLanguage(language)) return
+            if (!language) return
 
             block.innerHTML = hljs.highlight(block.textContent ?? '', {
                 language,

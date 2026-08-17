@@ -144,7 +144,7 @@ async def process_async(
                 stats["downloaded"] += 1
             except Exception as exc:
                 stats["failed"] += 1
-                buffer_log(f"[red]worker={worker_id} failed[/red] package={item} ")#err={exc}")
+                buffer_log(f"[red]worker={worker_id} failed[/red] package={item} err={exc}")
             finally:
                 progress.update(package_task, advance=1)
                 refresh_task()

@@ -13,6 +13,7 @@ dependencies = [
     "sqlmodel>=0.0.39",
     "markdown>=3.10.3",
     "docutils>=0.23",
+    "packaging>=26.3",
 ]
 
 [tool.uv.sources]

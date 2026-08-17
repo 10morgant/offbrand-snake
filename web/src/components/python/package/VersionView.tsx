@@ -25,6 +25,7 @@ import {
     IconArrowUp,
     IconCheck,
     IconCopy,
+    IconDownload,
     IconFlask,
     IconPackage,
     IconSearch,
@@ -32,13 +33,11 @@ import {
 } from "@tabler/icons-react";
 import {colourTheme} from "#/config/colours.ts";
 import {formatBytes, formatDate} from "#/logic/utils.ts";
-import {useRegistryContext} from "#/context/RegistryContext.tsx";
 import {isPreRelease} from "#/logic/version.ts";
 
-const SHOW_VARIANTS = true
 const DEFAULT_PAGE_SIZE = 100;
 const PAGE_SIZE_OPTIONS = [25, 50, DEFAULT_PAGE_SIZE, 150, 200, 300, 500, 1000];
-type SortKey = 'version' | 'version' | 'variant' | 'created';
+type SortKey = 'version' | 'variant' | 'created';
 type SortDirection = 'asc' | 'desc';
 
 interface Props {
@@ -181,6 +180,21 @@ export function VersionView({data, loading = false}: Props) {
         setPage(1);
     };
 
+    const handleDownload = (url?: string) => {
+        if (!url || typeof window === 'undefined') {
+            return;
+        }
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    };
+
     return (
         <Paper p="md" radius="md" withBorder style={{overflowX: 'auto'}}>
             <Flex justify={"space-between"} align="flex-end" gap="md" pb={10}>
@@ -256,13 +270,16 @@ export function VersionView({data, loading = false}: Props) {
                                 {getSortIcon(sort.key === 'created', sort.direction)}
                             </Flex>
                         </Table.Th>
-                        <Table.Th w={80}/>
+                        <Table.Th w={120}>
+                            Actions
+                        </Table.Th>
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                     {paginatedversions.map((version) => {
                         const pre = isPreRelease(version.version ?? "")
                         const yanked = version.yanked ?? false
+                        const downloadUrl = version.url;
                         return (
                             <Table.Tr
                                 key={`${version.version}-${version.digest}`}
@@ -316,7 +333,7 @@ export function VersionView({data, loading = false}: Props) {
                                     </Text>
                                 </Table.Td>
                                 <Table.Td>
-                                    <CopyButton value={`${data?.name}:${version.version}`} timeout={2000}>
+                                    <CopyButton value={`${data?.name}==${version.version}`} timeout={2000}>
                                         {({copied, copy}) => (
                                             <Tooltip
                                                 label={copied ? 'Copied!' : 'Copy name and version'}
@@ -355,6 +372,17 @@ export function VersionView({data, loading = false}: Props) {
                                             </Tooltip>
                                         )}
                                     </CopyButton>
+                                    <Tooltip label={downloadUrl ? 'Download file' : 'No download URL available'} withArrow position="top">
+                                        <ActionIcon
+                                            color="gray"
+                                            variant="subtle"
+                                            onClick={() => handleDownload(downloadUrl)}
+                                            size="sm"
+                                            disabled={!downloadUrl}
+                                        >
+                                            <IconDownload size={16}/>
+                                        </ActionIcon>
+                                    </Tooltip>
                                 </Table.Td>
                             </Table.Tr>
                         )
