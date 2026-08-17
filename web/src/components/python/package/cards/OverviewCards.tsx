@@ -57,7 +57,7 @@ export function OverviewCards({data}: Props) {
     }
 
     return (
-        <SimpleGrid cols={{base: 1, sm: 3}} w={1000} spacing="md" pt={30}>
+        <SimpleGrid cols={{base: 1, sm: 3}} spacing="md" pt={30}>
             {(data?.author || data?.author_email) && <UserCard
                 name={data?.author}
                 email={data?.author_email}
