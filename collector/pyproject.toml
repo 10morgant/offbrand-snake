@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = [
+    "beautifulsoup4>=4.12.0",
     "httpx>=0.28.1",
     "shared",
     "pytest>=8.4.1",
@@ -19,6 +20,7 @@ testpaths = ["tests"]
 
 [project.scripts]
 fetch = "collector.commands.fetch:app"
+fetch_html = "collector.commands.fetch_html:app"
 names = "collector.commands.names:app"
 process = "collector.commands.process:app"
 fake = "collector.fake:main"
