@@ -95,7 +95,7 @@ function VersionDetailsModal({version}: { version: Version }) {
     const pre = isPreRelease(version.version ?? "");
 
     return (
-        <Stack gap="md">
+        <Stack gap="md" >
             <Group gap="xs">
                 {pre && (
                     <Badge color="gray" variant="light" leftSection={<IconFlask size={12}/>}>
@@ -150,7 +150,7 @@ function VersionDetailsModal({version}: { version: Version }) {
                         >
                             <Table.Td>
                                 <Tooltip label={file.filename} withArrow>
-                                    <Text ff="monospace" size="sm" truncate="end" maw={340}>
+                                    <Text ff="monospace" size="sm" truncate="end" maw={540}>
                                         {file.filename}
                                     </Text>
                                 </Tooltip>
@@ -311,7 +311,7 @@ export function VersionView({data, loading = false}: Props) {
                     {data?.name} {version.version}
                 </Text>
             ),
-            size: 'xl',
+            size: "1200px",
             children: <VersionDetailsModal version={version}/>,
         });
     };

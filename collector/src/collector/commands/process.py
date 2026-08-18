@@ -31,6 +31,18 @@ def load_processed_packages(session: Session, registry: str, self_hosted: bool) 
     return frozenset(session.exec(stmt).all())
 
 
+def load_processed_versions(session: Session, registry: str, self_hosted: bool) -> dict[str, frozenset[str]]:
+    stmt = (
+        select(Package.name, PackageVersion.version)
+        .join(PackageVersion, PackageVersion.package_id == Package.id)  # type: ignore[arg-type]
+        .where(Package.src_registry == registry, Package.self_hosted == self_hosted)
+    )
+    versions: dict[str, set[str]] = {}
+    for name, version in session.exec(stmt).all():
+        versions.setdefault(name, set()).add(version)
+    return {name: frozenset(vs) for name, vs in versions.items()}
+
+
 @app.command()
 def process(
     index: str = "https://pypi.org",
@@ -40,10 +52,11 @@ def process(
     downloaders: int = 30,
     db_batch_size: int = 200,
     skip_existing: bool = False,
+    skip_existing_versions: bool = False,
 ) -> None:
     if not names_file.exists():
         raise BadParameter(f"Names file does not exist: {names_file}")
-    asyncio.run(process_async(index, names_file, db, self_hosted, downloaders, db_batch_size, skip_existing))
+    asyncio.run(process_async(index, names_file, db, self_hosted, downloaders, db_batch_size, skip_existing, skip_existing_versions))
 
 
 async def process_async(
@@ -54,6 +67,7 @@ async def process_async(
     downloaders: int,
     db_batch_size: int,
     skip_existing: bool = False,
+    skip_existing_versions: bool = False,
 ) -> None:
     engine = create_engine(db, echo=False)
     SQLModel.metadata.create_all(engine)
@@ -63,10 +77,15 @@ async def process_async(
     # packages we already have at least one version for; PyPI returns all versions of a
     # package in a single request, so skip-existing operates per-package rather than per-version
     processed_packages: frozenset[str] = frozenset()
+    processed_versions: dict[str, frozenset[str]] = {}
     if skip_existing:
         with console.status("[cyan]Loading processed packages from DB...", spinner="dots"), Session(engine) as session:
             processed_packages = load_processed_packages(session, index, self_hosted)
         console.log(f"[cyan]skip-existing[/cyan] loaded {len(processed_packages)} packages already processed")
+    if skip_existing_versions:
+        with console.status("[cyan]Loading processed versions from DB...", spinner="dots"), Session(engine) as session:
+            processed_versions = load_processed_versions(session, index, self_hosted)
+        console.log(f"[cyan]skip-existing-versions[/cyan] loaded versions for {len(processed_versions)} packages")
 
     console.print(Panel.fit(
         f"[bold cyan]Index[/bold cyan]         {index}\n"
@@ -75,13 +94,14 @@ async def process_async(
         f"[bold cyan]Downloaders[/bold cyan]   {downloaders}\n"
         f"[bold cyan]DB batch size[/bold cyan] {db_batch_size}\n"
         f"[bold cyan]Self hosted[/bold cyan]   {self_hosted}\n"
-        f"[bold cyan]Skip existing[/bold cyan] {skip_existing}",
+        f"[bold cyan]Skip existing[/bold cyan] {skip_existing}\n"
+        f"[bold cyan]Skip versions[/bold cyan] {skip_existing_versions}",
         title="[bold]process[/bold]", border_style="cyan",
     ))
 
     name_queue: asyncio.Queue[str | None] = asyncio.Queue(maxsize=downloaders * 4)
     db_queue: asyncio.Queue[PackagePayload | None] = asyncio.Queue(maxsize=downloaders * 8)
-    stats = {"queued": 0, "downloaded": 0, "failed": 0, "processed_versions": 0, "db_batches": 0, "db_records": 0, "skipped_packages": 0}
+    stats = {"queued": 0, "downloaded": 0, "failed": 0, "processed_versions": 0, "db_batches": 0, "db_records": 0, "skipped_packages": 0, "skipped_versions": 0}
     batch_versions = {"discovered": 0, "processed": 0}
     # printing directly while the Progress live display is active corrupts its rendering,
     # so events are buffered here and flushed to the console after the display closes
@@ -100,7 +120,7 @@ async def process_async(
 
     def refresh_task() -> None:
         progress.update(package_task, info=f"ok=[green]{stats['downloaded']}[/green] fail=[red]{stats['failed']}[/red] batches=[cyan]{stats['db_batches']}[/cyan]")
-        progress.update(version_task, info=f"total=[magenta]{stats['processed_versions']}[/magenta] skipped=[yellow]{stats['skipped_packages']}[/yellow]")
+        progress.update(version_task, info=f"total=[magenta]{stats['processed_versions']}[/magenta] skipped=[yellow]{stats['skipped_versions']}[/yellow]")
 
     def reset_version_bar() -> None:
         in_flight = max(batch_versions["discovered"] - batch_versions["processed"], 0)
@@ -138,7 +158,9 @@ async def process_async(
                 name_queue.task_done()
                 continue
             try:
-                payload, _ = await fetch_package_metadata(client, index, item, frozenset(), on_versions_discovered, on_version_processed, log=buffer_log)
+                known_versions = processed_versions.get(item, frozenset()) if skip_existing_versions else frozenset()
+                payload, skipped_count = await fetch_package_metadata(client, index, item, known_versions, on_versions_discovered, on_version_processed, log=buffer_log)
+                stats["skipped_versions"] += skipped_count
                 if payload is not None:
                     await db_queue.put(payload)
                 stats["downloaded"] += 1
@@ -208,6 +230,7 @@ async def process_async(
     summary.add_row("DB batches", str(stats["db_batches"]))
     summary.add_row("Versions changed", str(stats["db_records"]))
     summary.add_row("Packages skipped (existing)", f"[yellow]{stats['skipped_packages']}[/yellow]")
+    summary.add_row("Versions skipped (existing)", f"[yellow]{stats['skipped_versions']}[/yellow]")
     console.print(summary)
 
 
