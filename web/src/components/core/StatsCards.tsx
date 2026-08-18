@@ -1,5 +1,6 @@
 import {Group, Paper, Skeleton, Text, ThemeIcon} from '@mantine/core'
 import {type JSX} from "react";
+import {Link} from "@tanstack/react-router";
 
 
 interface StatCardProps {
@@ -8,11 +9,15 @@ interface StatCardProps {
     value: string | number | JSX.Element | undefined
     loading: boolean
     color?: string
+    to?: string
 }
 
-export function StatCard({icon, label, value, loading, color = 'blue'}: StatCardProps) {
+export function StatCard({icon, label, value, loading, to, color = 'blue'}: StatCardProps) {
     return (
-        <Paper p="lg" radius="md" withBorder style={{flex: 1}}>
+        <Paper p="lg" radius="md" withBorder style={{flex: 1}}
+               component={to ? Link : 'div'}
+               to={to ? to : undefined}
+        >
             <Group>
                 <ThemeIcon size={48} radius="md" color={color} variant="light">
                     {icon}

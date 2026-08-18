@@ -5,17 +5,18 @@ export type RegistryConfig = {
     name: string
 }
 
+const ls_key = 'pypiRegistryConfig';
 let registryConfig: RegistryConfig | null = null
 
 export const setRegistryConfig = (config: RegistryConfig) => {
     registryConfig = config
-    localStorage.setItem('registryConfig', JSON.stringify(config))
+    localStorage.setItem(ls_key, JSON.stringify(config))
 }
 
 export const getRegistryConfig = (): RegistryConfig | null => {
     if (registryConfig) return registryConfig
 
-    const stored = localStorage.getItem('registryConfig')
+    const stored = localStorage.getItem(ls_key)
     if (stored) {
         try {
             registryConfig = JSON.parse(stored)

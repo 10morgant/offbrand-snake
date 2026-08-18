@@ -148,6 +148,7 @@ class PackagePage(SQLModel):
 class Stats(SQLModel):
     packages: int
     versions: int
+    files: int
 
 def set_last_updated(session: Session) -> LastUpdated:
     row = session.get(LastUpdated, 1)

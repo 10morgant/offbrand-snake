@@ -3,7 +3,7 @@ from typing import Optional
 from sqlmodel import SQLModel, select, func
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from shared.models import Package, Stats, PackageVersion
+from shared.models import Package, Stats, PackageVersion, PackageVersionFile
 
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import selectinload
@@ -27,5 +27,11 @@ async def stats(session: AsyncSession = Depends(get_session)) -> Stats:
     )
     versions = versions_result.one()
 
-    return Stats(packages=packs, versions=versions)
+    files_result = await session.exec(
+        select(func.count()).select_from(PackageVersionFile)
+    )
+    files = files_result.one()
+    print(files)
+
+    return Stats(packages=packs, versions=versions, files=files)
 

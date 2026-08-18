@@ -73,6 +73,7 @@ export interface PackageInfo {
 export interface Stats {
     packages: number
     versions: number
+    files: number
 }
 
 export interface Registry {

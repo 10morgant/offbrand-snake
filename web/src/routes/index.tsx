@@ -21,18 +21,26 @@ function Home() {
             <Hero/>
             <div style={{backgroundColor: colourTheme.brand_dark}}>
                 <Container size={1600} pt={40} pb={40}>
-                    <SimpleGrid cols={3}>
+                    <SimpleGrid cols={4}>
                         <StatCard
                             icon={<IconFolder size={24}/>}
                             label="Total packages"
                             value={<NumberFormatter value={data?.packages} thousandSeparator/>}
                             loading={false}
                             color="yellow"
+                            to={"/project/"}
                         />
                         <StatCard
                             icon={<IconBox size={24}/>}
                             label="Total versions"
                             value={<NumberFormatter value={data?.versions} thousandSeparator/>}
+                            loading={false}
+                            color="blue"
+                        />
+                        <StatCard
+                            icon={<IconBox size={24}/>}
+                            label="Total files"
+                            value={<NumberFormatter value={data?.files} thousandSeparator/>}
                             loading={false}
                             color="blue"
                         />
