@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 from typing import Any, Callable
@@ -17,7 +17,12 @@ console = Console()
 def parse_upload_time(value: Any) -> datetime | None:
     if not isinstance(value, str) or not value:
         return None
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    # normalize to naive UTC so comparisons with DB-returned datetimes never mix
+    # offset-aware and offset-naive values
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone(timezone.utc).replace(tzinfo=None)
+    return parsed
 
 
 async def fetch_package_metadata(

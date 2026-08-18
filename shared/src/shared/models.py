@@ -50,8 +50,23 @@ class PackageVersion(SQLModel, table=True):
     package_id: int = Field(foreign_key="package.id", index=True)
     version: str = Field(index=True)
     requires_python: str | None = None
+    created_at: datetime | None = Field(default=None, index=True)
+    yanked: bool = False
+    yanked_reason: str | None = None
+    src_registry: str = Field(index=True)
+
+    package: Package = Relationship(back_populates="versions")
+    files: List["PackageVersionFile"] = Relationship(back_populates="version")
+
+
+class PackageVersionFile(SQLModel, table=True):
+    __tablename__ = "version_files"
+
+    id: int | None = Field(default=None, primary_key=True)
+    version_id: int = Field(foreign_key="versions.id", index=True)
+    filename: str = Field(index=True)
+    requires_python: str | None = None
     packagetype: str | None = None
-    filename: str | None = None
     digest: str | None = Field(default=None, index=True)
     size: int | None = Field(default=None, sa_type=BigInteger)
     created_at: datetime | None = Field(default=None, index=True)
@@ -60,25 +75,34 @@ class PackageVersion(SQLModel, table=True):
     url: str | None = None
     src_registry: str = Field(index=True)
 
-    package: Package = Relationship(back_populates="versions")
-
+    version: PackageVersion = Relationship(back_populates="files")
 
 
 # ---- Read view shared ----
+
+class PackageVersionFileRead(SQLModel):
+    id: int
+    version_id: Optional[int] = None
+    filename: str
+    requires_python: str | None = None
+    packagetype: str | None = None
+    digest: str | None = None
+    size: int | None = None
+    created_at: datetime | None = None
+    yanked: bool = False
+    yanked_reason: str | None = None
+    url: str | None = None
+
 
 class PackageVersionRead(SQLModel):
     id: int
     package_id: Optional[int] = None
     version: str
-    digest: str
-    size: int
-    created_at: datetime | None = None
     requires_python: str | None = None
-    packagetype: str | None = None
-    filename: str | None = None
+    created_at: datetime | None = None
     yanked: bool = False
     yanked_reason: str | None = None
-    url: str | None = None
+    files: List[PackageVersionFileRead] = Field(default_factory=list)
 
 
 class PackageRead(SQLModel):
@@ -138,20 +162,32 @@ def set_last_updated(session: Session) -> LastUpdated:
     return row
 
 
+def VersionFileDBOtoRead(dbo: PackageVersionFile) -> PackageVersionFileRead:
+    return PackageVersionFileRead(
+        id=dbo.id,
+        version_id=dbo.version_id,
+        filename=dbo.filename,
+        requires_python=dbo.requires_python,
+        packagetype=dbo.packagetype,
+        digest=dbo.digest,
+        size=dbo.size,
+        created_at=dbo.created_at,
+        yanked=dbo.yanked,
+        yanked_reason=dbo.yanked_reason,
+        url=dbo.url,
+    )
+
+
 def VersionDBOtoRead(dbo: PackageVersion):
     return PackageVersionRead(
         id=dbo.id,
         version=dbo.version,
         package_id=dbo.package_id,
-        digest=dbo.digest,
-        size=dbo.size,
-        created_at=dbo.created_at,
         requires_python=dbo.requires_python,
-        packagetype=dbo.packagetype,
-        filename=dbo.filename,
+        created_at=dbo.created_at,
         yanked=dbo.yanked,
         yanked_reason=dbo.yanked_reason,
-        url=dbo.url,
+        files=[VersionFileDBOtoRead(f) for f in dbo.files],
     )
 
 

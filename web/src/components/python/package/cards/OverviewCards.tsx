@@ -44,14 +44,14 @@ export function OverviewCards({data}: Props) {
                     </Grid.Col>
 
                     <Grid.Col w={200}>
-                        {(data?.requires_dist ?? []).length > 0 && (
-                            <DependenciesCard
-                                pack={data}
-                            />
-                        )}
+                        {has_extra && <ProvidesExtraCard data={data}/>}
                     </Grid.Col>
                 </Grid>
-                {has_extra && <ProvidesExtraCard data={data}/>}
+                {(data?.requires_dist ?? []).length > 0 && (
+                    <DependenciesCard
+                        pack={data}
+                    />
+                )}
             </SimpleGrid>
         );
     }

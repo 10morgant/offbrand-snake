@@ -1,5 +1,6 @@
 import {
     ActionIcon,
+    Badge,
     Center,
     Code,
     CopyButton,
@@ -16,9 +17,10 @@ import {
     TextInput,
     Tooltip,
 } from "@mantine/core";
+import {modals} from "@mantine/modals";
 import {useEffect, useMemo, useState} from "react";
 import {compareItems, rankings, rankItem} from "@tanstack/match-sorter-utils";
-import type {PackageInfo} from "#/logic/types.ts";
+import type {PackageInfo, Version} from "#/logic/types.ts";
 import {
     IconAlertSquareRounded,
     IconArrowDown,
@@ -27,6 +29,7 @@ import {
     IconCopy,
     IconDownload,
     IconFlask,
+    IconInfoCircle,
     IconPackage,
     IconSearch,
     IconTerminal,
@@ -64,6 +67,127 @@ const getSortIcon = (isActive: boolean, direction: SortDirection) => {
 const compareVersions = (left: string, right: string): number => {
     return left.localeCompare(right, undefined, {numeric: true, sensitivity: 'base'});
 };
+
+const handleDownload = (url?: string) => {
+    if (!url || typeof window === 'undefined') {
+        return;
+    }
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.download = '';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+};
+
+const getTotalSize = (version: Version): number => {
+    return (version.files ?? []).reduce((total, file) => total + file.size, 0);
+};
+
+function VersionDetailsModal({version}: { version: Version }) {
+    const sortedFiles = useMemo(
+        () => [...(version.files ?? [])].sort((a, b) => a.filename.localeCompare(b.filename)),
+        [version.files]
+    );
+    const pre = isPreRelease(version.version ?? "");
+
+    return (
+        <Stack gap="md">
+            <Group gap="xs">
+                {pre && (
+                    <Badge color="gray" variant="light" leftSection={<IconFlask size={12}/>}>
+                        Pre-release
+                    </Badge>
+                )}
+                {version.yanked && (
+                    <Badge color="red" variant="light" leftSection={<IconAlertSquareRounded size={12}/>}>
+                        Yanked
+                    </Badge>
+                )}
+            </Group>
+            {version.yanked && (
+                <Text size="sm" c="dimmed">
+                    Yanked due to: {version.yanked_reason ?? "unknown"}
+                </Text>
+            )}
+            <Group gap="xl">
+                <div>
+                    <Text size="xs" c="dimmed">Requires Python</Text>
+                    <Code>{version.requires_python || '—'}</Code>
+                </div>
+                <div>
+                    <Text size="xs" c="dimmed">Created</Text>
+                    <Text size="sm">{formatDate(version.created_at)}</Text>
+                </div>
+                <div>
+                    <Text size="xs" c="dimmed">Total size</Text>
+                    <Text size="sm">{formatBytes(getTotalSize(version))}</Text>
+                </div>
+                <div>
+                    <Text size="xs" c="dimmed">Files</Text>
+                    <Text size="sm">{sortedFiles.length}</Text>
+                </div>
+            </Group>
+
+            <Table striped highlightOnHover>
+                <Table.Thead>
+                    <Table.Tr>
+                        <Table.Th>File</Table.Th>
+                        <Table.Th>Type</Table.Th>
+                        <Table.Th>Size</Table.Th>
+                        <Table.Th>Uploaded</Table.Th>
+                        <Table.Th w={70}>Download</Table.Th>
+                    </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                    {sortedFiles.map((file) => (
+                        <Table.Tr
+                            key={file.digest}
+                            bg={file.yanked ? "rgba(255, 0, 0, 0.2)" : undefined}
+                        >
+                            <Table.Td>
+                                <Tooltip label={file.filename} withArrow>
+                                    <Text ff="monospace" size="sm" truncate="end" maw={340}>
+                                        {file.filename}
+                                    </Text>
+                                </Tooltip>
+                            </Table.Td>
+                            <Table.Td>
+                                <Code>{file.packagetype || '—'}</Code>
+                            </Table.Td>
+                            <Table.Td>
+                                <Text size="sm">{formatBytes(file.size)}</Text>
+                            </Table.Td>
+                            <Table.Td>
+                                <Text size="xs" c="dimmed">{formatDate(file.created_at)}</Text>
+                            </Table.Td>
+                            <Table.Td>
+                                <Tooltip
+                                    label={file.url ? 'Download file' : 'No download URL available'}
+                                    withArrow
+                                    position="top"
+                                >
+                                    <ActionIcon
+                                        color="gray"
+                                        variant="subtle"
+                                        onClick={() => handleDownload(file.url)}
+                                        size="sm"
+                                        disabled={!file.url}
+                                    >
+                                        <IconDownload size={16}/>
+                                    </ActionIcon>
+                                </Tooltip>
+                            </Table.Td>
+                        </Table.Tr>
+                    ))}
+                </Table.Tbody>
+            </Table>
+        </Stack>
+    );
+}
 
 export function VersionView({data, loading = false}: Props) {
     const [search, setSearch] = useState('');
@@ -180,19 +304,16 @@ export function VersionView({data, loading = false}: Props) {
         setPage(1);
     };
 
-    const handleDownload = (url?: string) => {
-        if (!url || typeof window === 'undefined') {
-            return;
-        }
-
-        const link = document.createElement('a');
-        link.href = url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.download = '';
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+    const openVersionModal = (version: Version) => {
+        modals.open({
+            title: (
+                <Text fw={600} ff="monospace">
+                    {data?.name} {version.version}
+                </Text>
+            ),
+            size: 'xl',
+            children: <VersionDetailsModal version={version}/>,
+        });
     };
 
     return (
@@ -263,7 +384,7 @@ export function VersionView({data, loading = false}: Props) {
                             </Table.Th>)}*/}
                         {/*<Table.Th>Digest</Table.Th>*/}
                         {/*<Table.Th>Platform(s)</Table.Th>*/}
-                        <Table.Th>Size</Table.Th>
+                        <Table.Th>Files</Table.Th>
                         <Table.Th onClick={() => handleSort('created')} style={{cursor: 'pointer'}}>
                             <Flex align="center" gap={4}>
                                 <Text>Created</Text>
@@ -279,10 +400,9 @@ export function VersionView({data, loading = false}: Props) {
                     {paginatedversions.map((version) => {
                         const pre = isPreRelease(version.version ?? "")
                         const yanked = version.yanked ?? false
-                        const downloadUrl = version.url;
                         return (
                             <Table.Tr
-                                key={`${version.version}-${version.digest}`}
+                                key={version.id}
                                 bg={yanked ? "rgba(255, 0, 0, 0.5)" : undefined}
                             >
                                 <Table.Td>
@@ -325,7 +445,7 @@ export function VersionView({data, loading = false}: Props) {
                                     <PlatformBadges platforms={version.platforms}/>
                                 </Table.Td>*/}
                                 <Table.Td>
-                                    <Text size="sm">{formatBytes(version.size)}</Text>
+                                    <Text size="sm">{version.files.length}</Text>
                                 </Table.Td>
                                 <Table.Td>
                                     <Text size="xs" c="dimmed">
@@ -333,6 +453,16 @@ export function VersionView({data, loading = false}: Props) {
                                     </Text>
                                 </Table.Td>
                                 <Table.Td>
+                                    <Tooltip label="View files" withArrow position="top">
+                                        <ActionIcon
+                                            color="gray"
+                                            variant="subtle"
+                                            onClick={() => openVersionModal(version)}
+                                            size="sm"
+                                        >
+                                            <IconInfoCircle size={16}/>
+                                        </ActionIcon>
+                                    </Tooltip>
                                     <CopyButton value={`${data?.name}==${version.version}`} timeout={2000}>
                                         {({copied, copy}) => (
                                             <Tooltip
@@ -372,17 +502,6 @@ export function VersionView({data, loading = false}: Props) {
                                             </Tooltip>
                                         )}
                                     </CopyButton>
-                                    <Tooltip label={downloadUrl ? 'Download file' : 'No download URL available'} withArrow position="top">
-                                        <ActionIcon
-                                            color="gray"
-                                            variant="subtle"
-                                            onClick={() => handleDownload(downloadUrl)}
-                                            size="sm"
-                                            disabled={!downloadUrl}
-                                        >
-                                            <IconDownload size={16}/>
-                                        </ActionIcon>
-                                    </Tooltip>
                                 </Table.Td>
                             </Table.Tr>
                         )

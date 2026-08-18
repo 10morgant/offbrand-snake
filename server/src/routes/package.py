@@ -8,7 +8,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from db import get_session
-from shared.models import Package, PackageRead, PackageDBOtoRead, PackageRequirement, PackagePage
+from shared.models import Package, PackageVersion, PackageRead, PackageDBOtoRead, PackageRequirement, PackagePage
 
 router = APIRouter(prefix="/package", tags=["packages"])
 
@@ -47,7 +47,7 @@ async def get_namespace(
     print(package)
     stmt = (
         select(Package)
-        .options(selectinload(Package.versions))
+        .options(selectinload(Package.versions).selectinload(PackageVersion.files))
         .where(Package.name == package)
     )
 

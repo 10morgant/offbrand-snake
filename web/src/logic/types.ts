@@ -14,19 +14,28 @@ export interface SearchRoot {
 
 export type RootProjecturls = Record<string, string>
 
-export interface Version {
+export interface VersionFile {
     id: number;
-    package_id: number;
-    version: string;
+    version_id: number;
     digest: string;
     size: number;
     created_at: string;
-    requires_python: string;
     packagetype: string;
     filename: string;
     yanked: boolean;
     yanked_reason?: string;
     url: string;
+}
+
+export interface Version {
+    id: number;
+    package_id: number;
+    version: string;
+    requires_python: string;
+    created_at: string;
+    yanked: boolean;
+    yanked_reason?: string;
+    files: VersionFile[];
 }
 
 export interface PackageInfo {
@@ -77,12 +86,12 @@ export interface LastUpdated {
 }
 
 export interface PackageRequirement {
-    package_id:number,
-    name:string
-    extras:string[]
-    url?:string
-    specifier?:string
-    marker?:string
+    package_id: number,
+    name: string
+    extras: string[]
+    url?: string
+    specifier?: string
+    marker?: string
 
 
 }

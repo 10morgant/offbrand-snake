@@ -3,7 +3,9 @@ import {
     AppShell,
     AppShellHeader,
     Container,
-    createTheme, DataListItemLabel, DataListItemValue,
+    createTheme,
+    DataListItemLabel,
+    DataListItemValue,
     Group,
     MantineProvider,
     Text,
@@ -21,6 +23,7 @@ import {fetchLastUpdatedOptions, fetchRegistriesOptions} from "#/logic/queries.t
 import {formatDate} from "#/logic/utils.ts";
 import type {Registry} from "#/logic/types.ts";
 import {Apps} from "#/components/core/Apps.tsx";
+import {ModalsProvider} from "@mantine/modals";
 
 const queryClient = new QueryClient()
 
@@ -58,15 +61,15 @@ const theme = createTheme({
             defaultProps: {
                 fz: 16,
                 fw: 500,
-                c:"white",
-                tt:"uppercase"
+                c: "white",
+                tt: "uppercase"
             }
         }),
         DataListItemValue: DataListItemValue.extend({
             defaultProps: {
                 fz: 16,
                 fw: 500,
-                c:"rgb(93, 202, 165)",
+                c: "rgb(93, 202, 165)",
                 // tt:"uppercase"
             }
         }),
@@ -128,16 +131,18 @@ function AppHeader() {
 function RootComponent() {
     return (
         <MantineProvider theme={theme} forceColorScheme="dark">
-            <QueryClientProvider client={queryClient}>
-                <RegistryProvider>
-                    <AppShell header={{height: 70}}>
-                        <AppHeader/>
-                        <AppShell.Main style={{backgroundColor: colourTheme.page}}>
-                            <Outlet/>
-                        </AppShell.Main>
-                    </AppShell>
-                </RegistryProvider>
-            </QueryClientProvider>
+            <ModalsProvider>
+                <QueryClientProvider client={queryClient}>
+                    <RegistryProvider>
+                        <AppShell header={{height: 70}}>
+                            <AppHeader/>
+                            <AppShell.Main style={{backgroundColor: colourTheme.page}}>
+                                <Outlet/>
+                            </AppShell.Main>
+                        </AppShell>
+                    </RegistryProvider>
+                </QueryClientProvider>
+            </ModalsProvider>
         </MantineProvider>
     )
 }
